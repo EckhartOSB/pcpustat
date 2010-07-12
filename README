@@ -1,0 +1,19 @@
+pcpustat -- per-CPU usage percentages
+
+Sterling (Chip) Camden, July, 2010
+
+This utility is designed for FreeBSD.
+
+To install:
+
+make
+sudo cp pcpustat /usr/local/bin
+sudo cp man/man1/pcpustat.1 /usr/local/man
+
+Now, you can get usage with:
+
+man pcpustat
+
+or
+
+pcpustat -h
