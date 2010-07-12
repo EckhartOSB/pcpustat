@@ -1,0 +1,47 @@
+.\" man page for the pcpustat utility.
+.Dd July 12, 2010
+.Dt PCPUSTAT 1
+.Os
+.Sh NAME
+.Nm pcpustat
+.Nd per-CPU usage statistics
+.Sh SYNOPSIS
+.Nm
+.Op Fl ahinqstux
+.Op Fl c Ar count
+.Op Fl p Ar cpu
+.Op Fl w Ar wait
+.Sh DESCRIPTION
+The pcpustat utility provides per-CPU usage statistics.  This information is computed using the same algorithm as in top(1) with the -P option, but the output format is more similar to that of iostat(8) so that it can be piped and reformatted.
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl a, all
+Include all usage statistics (same as -instu).  This is the default if no specific statistics are selected.
+.It Fl c, count Ar count
+Sample statistics the specified number of times.  If not specified, it defaults to forever if -w is not specified, otherwise 1.
+.It Fl h, help
+Print the list of options and exit.
+.It Fl i, idle
+Include idle time in the statistics.
+.It Fl n, nice
+Include nice time in the statistics.
+.It Fl p, cpu Ar cpu
+Select processor cpu [0-n].  You may repeat the switch to select more than one CPU.  The default is to include all CPUs.
+.It Fl q, quiet
+Print no header, only the data.
+.It Fl s, system
+Include system time in the statistics.
+.It Fl t, interrupt
+Include interrupt time in the statistics.
+.It Fl u, user
+Include user time in the statistics.
+.It Fl w, wait Ar wait
+Pause the specified number of seconds between updates.  The default is 1.
+.It Fl x, not
+Report the percentage of time not in each state.  If specified, each percentage is subtracted from 100.  The header (unless the -q option is selected) displays a "!" before each heading.
+.Sh SEE ALSO
+top(1), iostat(8), sysctl(3), sysctl(8)
+.Sh AUTHOR
+Sterling (Chip) Camden <sterling@camdensoftware.com>, http://chipstips.com/?tag=c_pcpustat
+.Sh BUGS
+The pcpustat utility can only report on CPUs 0-n, where n is one less than the number of bits in a long.
