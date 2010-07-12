@@ -111,7 +111,7 @@ int main(int ac, char **av)
 	        cpu = strtol(optarg, NULL, 10);
 		if ((cpu < 0) || (cpu > (ncpu-1)))
 		{
-		    printf("error: -p specifies invalid CPU number, range 0-%d\n", ncpu-1);
+		    fprintf(stderr, "error: -p specifies invalid CPU number, range 0-%d\n", ncpu-1);
 		    exit(1);
 		}
 		cpus |= 1 << cpu;
@@ -228,6 +228,7 @@ int main(int ac, char **av)
 	      }
 	  }
 	printf("\n");
+	fflush(stdout);
 
 	memmove(cpu_prev, cpu_curr, state_size);
     }

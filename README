@@ -4,9 +4,13 @@ Sterling (Chip) Camden, July, 2010
 
 This utility is designed for FreeBSD.
 
-To install:
+To build:
 
 make
+
+If you like, you can copy the utility and its man page to a publicly
+accessible directory:
+
 sudo cp pcpustat /usr/local/bin
 sudo cp man/man1/pcpustat.1 /usr/local/man
 
