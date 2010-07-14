@@ -8,6 +8,8 @@
 #include <sys/resource.h>
 #include <sys/sysctl.h>
 
+static const char* what_string="@(#)pcpustat 1.0";
+
 /* Bit flags for what stats to include: */
 
 #define STAT_USER	0x01

@@ -1,3 +1,4 @@
-pcpustat: pcpustat.c
-	cc -Wall -o pcpustat pcpustat.c
-	strip pcpustat
+CC ?= cc
+
+all:	pcpustat.c
+	$(CC) -o pcpustat pcpustat.c
