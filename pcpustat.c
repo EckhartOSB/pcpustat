@@ -31,7 +31,7 @@ struct opthelp {
 
 int main(int ac, char **av)
 {
-    int c, option_index, stats=0, count=-1, wait=0, cpu, ncpu, quiet=0, not=0;
+    int c, option_index, stats=0, count=-1, wait=0, cpu, maxcpu, ncpu, quiet=0, not=0;
     size_t state_size;
     long cpus=0;
     long *cpu_prev, *cpu_curr;
@@ -194,7 +194,8 @@ int main(int ac, char **av)
 	printf("\n");
     }
 
-    state_size = CPUSTATES * ncpu * sizeof(long);
+    GETSYSCTL("kern.smp.maxcpus", maxcpu);
+    state_size = CPUSTATES * maxcpu * sizeof(long);
     cpu_prev = malloc(state_size);
     cpu_curr = malloc(state_size);
     getsysctl("kern.cp_times", cpu_prev, state_size);
