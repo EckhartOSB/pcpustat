@@ -253,9 +253,4 @@ getsysctl(const char *name, void *ptr, size_t len)
 		    sys_errlist[errno]);
 		exit(23);
 	}
-	if (nlen != len) {
-		fprintf(stderr, "pcpustat: sysctl(%s...) expected %lu, got %lu\n",
-		    name, (unsigned long)len, (unsigned long)nlen);
-		exit(23);
-	}
 }
