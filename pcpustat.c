@@ -8,6 +8,10 @@
 #include <sys/resource.h>
 #include <sys/sysctl.h>
 
+#ifndef CPUSTATES
+#define CPUSTATES	5
+#endif
+
 static const char* what_string="@(#)pcpustat 1.2";
 
 /* Bit flags for what stats to include: */
