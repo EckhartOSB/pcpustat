@@ -9,10 +9,10 @@
 #include <sys/sysctl.h>
 
 #ifndef CPUSTATES
-#define CPUSTATES	5
+#define CPUSTATES	5	/* OSX doesn't define this */
 #endif
 
-static const char* what_string="@(#)pcpustat 1.2";
+static const char* what_string="@(#)pcpustat 1.3";
 
 /* Bit flags for what stats to include: */
 
@@ -27,6 +27,7 @@ static const char* what_string="@(#)pcpustat 1.2";
 /* Copied from /usr/src/usr.bin/top/machine.c */
 #define GETSYSCTL(name, var) getsysctl(name, &(var), sizeof(var))
 static void getsysctl(const char *name, void *ptr, size_t len);
+static size_t getsysctllen(const char *name);
 
 struct opthelp {
     char *argname;
@@ -35,7 +36,7 @@ struct opthelp {
 
 int main(int ac, char **av)
 {
-    int c, option_index, stats=0, count=-1, wait=0, cpu, maxcpu, ncpu, quiet=0, not=0;
+    int c, option_index, stats=0, count=-1, wait=0, cpu, ncpu, quiet=0, not=0;
     size_t state_size;
     long cpus=0;
     long *cpu_prev, *cpu_curr;
@@ -198,8 +199,7 @@ int main(int ac, char **av)
 	printf("\n");
     }
 
-    GETSYSCTL("kern.smp.maxcpus", maxcpu);
-    state_size = CPUSTATES * maxcpu * sizeof(long);
+    state_size = getsysctllen("kern.cp_times");
     cpu_prev = malloc(state_size);
     cpu_curr = malloc(state_size);
     getsysctl("kern.cp_times", cpu_prev, state_size);
@@ -257,4 +257,16 @@ getsysctl(const char *name, void *ptr, size_t len)
 		    sys_errlist[errno]);
 		exit(23);
 	}
+}
+
+static size_t
+getsysctllen(const char *name)
+{
+	size_t len = 0;
+	if (sysctlbyname(name, NULL, &len, NULL, 0) == -1) {
+		fprintf(stderr, "pcpustat: sysctl(%s...) failed: %s\n", name,
+		    sys_errlist[errno]);
+		exit(23);
+	}
+	return len;
 }
