@@ -39,6 +39,35 @@ Include user time in the statistics.
 Pause the specified number of seconds between updates.  The default is 1.
 .It Fl x, not
 Report the percentage of time not in each state.  If specified, each percentage is subtracted from 100.  The header (unless the -q option is selected) displays a "!" before each heading.
+.Sh OUTPUT FORMAT
+If the 
+.Op Fl q
+option is not specified, the first two lines of output will contain a header.
+.Pp
+The first line lists the CPUs, by number.  If the options
+specify only one column of information per CPU, then this line will only contain the CPU numbers (starting with 0), otherwise it will contain
+the string "cpu " followed by the number.  This heading will be right-justified over the columns that apply to that CPU.
+.Pp
+The second header line labels the columns within the output for each CPU.  These labels can be any of the following:
+.Pp
+.Bl -tag -width indent -compact
+.It \&us
+% of cpu time in user mode
+.It \&ni
+% of cpu time in user mode running niced processes
+.It \&sy
+% of cpu time in system mode
+.It \&in
+% of cpu time in interrupt mode
+.It \&id
+% of cpu time in idle mode
+.El
+.Pp
+If the
+.Op Fl x
+option was specified, then each of the above is prefixed by '!'.
+.Pp
+The remaining lines of output will be the percentage of time each CPU spent in each of the designated states since the previous line (or since pcpustat started, in the case of the first line).
 .Sh SEE ALSO
 top(1), iostat(8), sysctl(3), sysctl(8)
 .Sh AUTHOR
