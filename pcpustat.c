@@ -97,7 +97,7 @@ int main(int ac, char **av)
             case 'h':
 	    {
 	        int n, nopts = (sizeof(options) / sizeof(struct option));
-		printf("usage: pcpustat [-");
+		printf("%s\nusage: pcpustat [-", what_string+4);
 		for (n = 0; n < nopts; n++)
 		  if (!(help[n].argname))
 		    printf("%c", options[n].val);
