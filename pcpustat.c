@@ -12,7 +12,7 @@
 #define CPUSTATES	5	/* OSX doesn't define this */
 #endif
 
-static const char* what_string="@(#)pcpustat 1.3";
+static const char* what_string="@(#)pcpustat 1.4";
 
 /* Bit flags for what stats to include: */
 
@@ -37,12 +37,14 @@ struct opthelp {
 int main(int ac, char **av)
 {
     int c, option_index, stats=0, count=-1, wait=0, cpu, ncpu, quiet=0, not=0;
+    char *delim=NULL;
     size_t state_size;
     long cpus=0;
     long *cpu_prev, *cpu_curr;
     struct option options[] = {
       {"all", 0, 0, 'a'},
       {"count", 1, 0, 'c'},
+      {"delim", 1, 0, 'd'},
       {"help", 0, 0, 'h'},
       {"idle", 0, 0, 'i'},
       {"nice", 0, 0, 'n'},
@@ -57,6 +59,7 @@ int main(int ac, char **av)
     struct opthelp help[] = {
       {0,"include all usage statistics (-instu)"},
       {"count","repeat count times (default = forever if wait is specified)"},
+      {"delimiter","separate columns with delimiter instead of justifying with spaces"},
       {0,"print this list and exit"},
       {0,"include idle time"},
       {0,"include nice time"},
@@ -74,7 +77,7 @@ int main(int ac, char **av)
     if (ncpu > sizeof(long)*8)
       ncpu = sizeof(long)*8;	/* We're using a bit per CPU */
 
-    while ((c = getopt_long(ac, av, "ac:hinp:qsuw:x", options, &option_index)) >= 0)
+    while ((c = getopt_long(ac, av, "ac:d:hinp:qstuw:x", options, &option_index)) >= 0)
     {
         switch (c)
         {
@@ -85,6 +88,11 @@ int main(int ac, char **av)
 	    case 'c':
 		count = strtol(optarg, NULL, 10);
 	        break;
+
+	    case 'd':
+	    	delim = malloc(strlen(optarg)+1);
+		strcpy(delim, optarg);
+		break;
 
             case 'h':
 	    {
@@ -166,37 +174,79 @@ int main(int ac, char **av)
 
     if (!quiet)
     {
-	char head[21], fmt[5];
+	char *head, fmt[5];
 	int i;
 
-	sprintf(head, "%s%s%s%s%s",
-	    (stats & STAT_USER) ? "  us" : "",
-	    (stats & STAT_NICE) ? "  ni" : "",
-	    (stats & STAT_SYSTEM) ? "  sy" : "",
-	    (stats & STAT_INT) ? "  in" : "",
-	    (stats & STAT_IDLE) ? "  id" : "");
-	if (not)
-	  for (i=1; i<strlen(head); i+=4)
-	    head[i] = '!';
-        sprintf(fmt, "%%%ds", (int)strlen(head));
+	if (delim)
+	{
+	    head = malloc((strlen(delim)+3)*5+1);
+	    char *p = head;
+	    int cnt = 0;
+	    #define ADD_HEAD(s) { \
+				    if (not) *p++ = '!';\
+				    sprintf(p,"%s%s",s,delim);\
+				    p+=strlen(p);\
+				    cnt += 1;\
+				  }
+	    if (stats & STAT_USER)
+	      ADD_HEAD("us");
+	    if (stats & STAT_NICE)
+	      ADD_HEAD("ni");
+	    if (stats & STAT_SYSTEM)
+	      ADD_HEAD("sy");
+	    if (stats & STAT_INT)
+	      ADD_HEAD("in");
+	    if (stats & STAT_IDLE)
+	      ADD_HEAD("id");
+	    #undef ADD_HEAD
+	    *(p-=strlen(delim)) = 0;		/* Overwrite last delimiter */
+	    cnt--;
+	    for (cpu = 0; cpu < ncpu; cpu++)
+	    {
+	      int dc;
+	      if (cpu > 0)
+	        printf(delim);
+	      printf("cpu %d", cpu);
+	      for (dc=0; dc < cnt; dc++)
+	        printf(delim);
+	    }
+	    printf("\n");
+	}
+	else
+	{
+	    head = malloc(21);
+	    sprintf(head, "%s%s%s%s%s",
+		(stats & STAT_USER) ? "  us" : "",
+		(stats & STAT_NICE) ? "  ni" : "",
+		(stats & STAT_SYSTEM) ? "  sy" : "",
+		(stats & STAT_INT) ? "  in" : "",
+		(stats & STAT_IDLE) ? "  id" : "");
+	    if (not)
+	      for (i=1; i<strlen(head); i+=4)
+		head[i] = '!';
+	    sprintf(fmt, "%%%ds", (int)strlen(head));
 
+	    for (cpu = 0; cpu < ncpu; cpu++)
+	      if (cpus & (1 << cpu))
+	      {
+		char str[8];
+		if (strlen(head) > 5)
+		  sprintf(str, "cpu %d", cpu);
+		else
+		  sprintf(str, "%d", cpu);
+		printf(fmt, str);
+	      }
+	    printf("\n");
+	}
 	for (cpu = 0; cpu < ncpu; cpu++)
 	  if (cpus & (1 << cpu))
 	  {
-	    char str[8];
-	    if (strlen(head) > 5)
-	      sprintf(str, "cpu %d", cpu);
-	    else
-	      sprintf(str, "%d", cpu);
-	    printf(fmt, str);
-	  }
-	printf("\n");
-	for (cpu = 0; cpu < ncpu; cpu++)
-	  if (cpus & (1 << cpu))
-	  {
+	    if (delim && (cpu > 0))
+	      printf(delim);
 	    printf(head);
 	  }
 	printf("\n");
+	free(head);
     }
 
     state_size = getsysctllen("kern.cp_times");
@@ -207,6 +257,7 @@ int main(int ac, char **av)
     for (;count; count--)	/* Negative = forever */
     {
 	long *prev, *curr;
+	int first = 1;
 
 	if (wait > 0)
             sleep(wait);
@@ -231,7 +282,18 @@ int main(int ac, char **av)
 	        int pct = (int)((diff[n] * 100 + h) / total);
 		if (not)
 		  pct = 100 - pct;
-	        printf(" %3d", pct);
+		if (delim)
+		{
+		    if (first)
+		       first = 0;
+		    else
+		       printf(delim);
+		    printf("%d", pct);
+		}
+		else
+		{
+	            printf(" %3d", pct);
+		}
 	      }
 	  }
 	printf("\n");
@@ -242,6 +304,8 @@ int main(int ac, char **av)
 
     free(cpu_prev);
     free(cpu_curr);
+    if (delim)
+      free(delim);
     return(0);
 }
 

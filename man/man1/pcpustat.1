@@ -1,5 +1,5 @@
 .\" man page for the pcpustat utility.
-.Dd July 12, 2010
+.Dd September 26, 2010
 .Dt PCPUSTAT 1
 .Os
 .Sh NAME
@@ -9,6 +9,7 @@
 .Nm
 .Op Fl ahinqstux
 .Op Fl c Ar count
+.Op Fl d Ar delimiter
 .Op Fl p Ar cpu
 .Op Fl w Ar wait
 .Sh DESCRIPTION
@@ -19,6 +20,8 @@ The pcpustat utility provides per-CPU usage statistics.  This information is com
 Include all usage statistics (same as -instu).  This is the default if no specific statistics are selected.
 .It Fl c, count Ar count
 Sample statistics the specified number of times.  If not specified, it defaults to 1 if -w is not specified, otherwise forever.
+.It Fl d, delim Ar delimiter
+Delimit columns with delimiter instead of justifying them with spaces.
 .It Fl h, help
 Print the list of options and exit.
 .It Fl i, idle
@@ -46,7 +49,9 @@ option is not specified, the first two lines of output will contain a header.
 .Pp
 The first line lists the CPUs, by number.  If the options
 specify only one column of information per CPU, then this line will only contain the CPU numbers (starting with 0), otherwise it will contain
-the string "cpu " followed by the number.  This heading will be right-justified over the columns that apply to that CPU.
+the string "cpu " followed by the number.  This heading will be right-justified over the columns that apply to that CPU, unless the
+.Op Fl d
+option is specified (in which case the headers are also delimited).
 .Pp
 The second header line labels the columns within the output for each CPU.  These labels can be any of the following:
 .Pp
@@ -68,9 +73,16 @@ If the
 option was specified, then each of the above is prefixed by '!'.
 .Pp
 The remaining lines of output will be the percentage of time each CPU spent in each of the designated states since the previous line (or since pcpustat started, in the case of the first line).
+.Pp
+If the
+.Op Fl d
+option is specified, then the string specified as its argument will occur between each column.  Otherwise, enough spaces will be used to
+right-align each column under its heading.
 .Sh SEE ALSO
 top(1), iostat(8), sysctl(3), sysctl(8)
 .Sh AUTHOR
-Sterling (Chip) Camden <sterling@camdensoftware.com>, http://chipstips.com/?tag=c_pcpustat
+Sterling (Chip) Camden <sterling@camdensoftware.com>
+.Sh SITE
+http://chipstips.com/?tag=c_pcpustat
 .Sh BUGS
 The pcpustat utility can only report on CPUs 0-n, where n is one less than the number of bits in a long.
