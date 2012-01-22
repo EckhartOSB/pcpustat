@@ -12,7 +12,7 @@
 #define CPUSTATES	5	/* OSX doesn't define this */
 #endif
 
-static const char* what_string="@(#)pcpustat 1.4";
+static const char* what_string="@(#)pcpustat 1.5";
 
 /* Bit flags for what stats to include: */
 
@@ -101,11 +101,11 @@ int main(int ac, char **av)
 		for (n = 0; n < nopts; n++)
 		  if (!(help[n].argname))
 		    printf("%c", options[n].val);
-		printf("]");
+		fputs("]", stdout);
 		for (n = 0; n < nopts; n++)
 		  if (help[n].argname)
 		    printf(" [-%c %s]", options[n].val, help[n].argname);
-		printf("\n");
+		fputs("\n", stdout);
 		for (n = 0; n < nopts; n++)
 		    printf("  -%c, --%-10s\t%s\n", options[n].val, options[n].name,
 		    	help[n].description);
@@ -205,12 +205,12 @@ int main(int ac, char **av)
 	    {
 	      int dc;
 	      if (cpu > 0)
-	        printf(delim);
+	        fputs(delim, stdout);
 	      printf("cpu %d", cpu);
 	      for (dc=0; dc < cnt; dc++)
-	        printf(delim);
+	        fputs(delim, stdout);
 	    }
-	    printf("\n");
+	    fputs("\n", stdout);
 	}
 	else
 	{
@@ -236,16 +236,16 @@ int main(int ac, char **av)
 		  sprintf(str, "%d", cpu);
 		printf(fmt, str);
 	      }
-	    printf("\n");
+	    fputs("\n", stdout);
 	}
 	for (cpu = 0; cpu < ncpu; cpu++)
 	  if (cpus & (1 << cpu))
 	  {
 	    if (delim && (cpu > 0))
-	      printf(delim);
-	    printf(head);
+	      fputs(delim, stdout);
+	    fputs(head, stdout);
 	  }
-	printf("\n");
+	fputs("\n", stdout);
 	free(head);
     }
 
@@ -287,7 +287,7 @@ int main(int ac, char **av)
 		    if (first)
 		       first = 0;
 		    else
-		       printf(delim);
+		       fputs(delim, stdout);
 		    printf("%d", pct);
 		}
 		else
@@ -296,7 +296,7 @@ int main(int ac, char **av)
 		}
 	      }
 	  }
-	printf("\n");
+	fputs("\n", stdout);
 	fflush(stdout);
 
 	memmove(cpu_prev, cpu_curr, state_size);
