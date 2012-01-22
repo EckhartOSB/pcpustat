@@ -1,4 +1,5 @@
 CC ?= cc
 
-all:	pcpustat.c
+all:	pcpustat
+pcpustat: pcpustat.c
 	$(CC) -o pcpustat pcpustat.c
