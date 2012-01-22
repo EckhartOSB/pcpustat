@@ -36,7 +36,8 @@ struct opthelp {
 
 int main(int ac, char **av)
 {
-    int c, option_index, stats=0, count=-1, wait=0, cpu, ncpu, quiet=0, not=0;
+    int c, option_index, stats=0, count=-1, wait=0, cpu, quiet=0, not=0;
+    unsigned int ncpu;
     char *delim=NULL;
     size_t state_size;
     long cpus=0;
@@ -175,7 +176,7 @@ int main(int ac, char **av)
     if (!quiet)
     {
 	char *head, fmt[5];
-	int i;
+	size_t i;
 
 	if (delim)
 	{
