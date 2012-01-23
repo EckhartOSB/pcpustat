@@ -255,7 +255,7 @@ int main(int ac, char **av)
     cpu_curr = malloc(state_size);
     getsysctl("kern.cp_times", cpu_prev, state_size);
 
-    for (;count; count--)	/* Negative = forever */
+    while ((count < 0) || count--)	/* Negative = forever */
     {
 	long *prev, *curr;
 	int first = 1;
