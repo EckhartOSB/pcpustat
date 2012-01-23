@@ -12,7 +12,7 @@
 #define CPUSTATES	5	/* OSX doesn't define this */
 #endif
 
-static const char* what_string="@(#)pcpustat 1.5";
+static const char* what_string="@(#)pcpustat 1.6";
 
 /* Bit flags for what stats to include: */
 
